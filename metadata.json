@@ -1,5 +1,5 @@
 {
-  "name": "Gestor de Suscripciones",
+  "name": "Gestio",
   "description": "Organiza tus pagos mensuales de suscripciones y recibe recordatorios antes de que venzan.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
