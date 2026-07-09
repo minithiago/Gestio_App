@@ -1,3 +1,6 @@
+
+<img width="2040" height="576" alt="gestio-wordmark" src="https://github.com/user-attachments/assets/bc72e1cb-b2f5-45f7-aa89-b4097bc99559" />
+
 # 📱 'Gestio' App Gestor de suscripciones
 
 
