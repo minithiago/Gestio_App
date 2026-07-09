@@ -1,8 +1,7 @@
 
-<img width="2040" height="576" alt="gestio-wordmark" src="https://github.com/user-attachments/assets/bc72e1cb-b2f5-45f7-aa89-b4097bc99559" />
+<img width="2040" height="576" alt="gestio-wordmarkFondo" src="https://github.com/user-attachments/assets/f6b129eb-b0be-46ac-8869-70cae136d5f4" />
 
 # 📱 'Gestio' App Gestor de suscripciones
-
 
 **Gestio** es una aplicación para Android desarrollada en Kotlin que te ayuda a organizar, realizar un seguimiento y gestionar todas tus suscripciones digitales en un solo lugar. No vuelvas a pasar por alto una fecha de renovación ni a perder la cuenta de tus gastos mensuales.
 
