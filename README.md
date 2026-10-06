@@ -1,26 +1,26 @@
 
 <img width="2040" height="576" alt="gestio-wordmarkFondo" src="https://github.com/user-attachments/assets/f6b129eb-b0be-46ac-8869-70cae136d5f4" />
 
-# 📱 'Gestio' App Gestor de suscripciones
+# 📱 'Gestio' Subscription Manager App
 
-**Gestio** es una aplicación para Android desarrollada en Kotlin que te ayuda a organizar, realizar un seguimiento y gestionar todas tus suscripciones digitales en un solo lugar. No vuelvas a pasar por alto una fecha de renovación ni a perder la cuenta de tus gastos mensuales.
-
----
-
-## ✨ Características
-
-- 📋 Gestiona todas tus suscripciones en un solo lugar
-- ➕ Añade, edita y elimina suscripciones
-- 💰 Controla los costes mensuales y anuales de tus suscripciones
-- 📅 Consulta las próximas fechas de renovación
-- 🔔 Recordatorios y notificaciones de renovación
-- 📊 Supervisa tus gastos en suscripciones
-- 🔍 Busca y filtra suscripciones
-- 📱 Interfaz limpia e intuitiva basada en Material Design
+**Gestio** is an Android app built with Kotlin that helps you organize, track and manage all your digital subscriptions in one place. Never miss a renewal date or lose track of your monthly spending again.
 
 ---
 
-## 📸 Vista previa
+## ✨ Features
+
+- 📋 Manage all your subscriptions in one place
+- ➕ Add, edit and delete subscriptions
+- 💰 Track the monthly and yearly costs of your subscriptions
+- 📅 Check upcoming renewal dates
+- 🔔 Renewal reminders and notifications
+- 📊 Monitor your subscription spending
+- 🔍 Search and filter subscriptions
+- 📱 Clean, intuitive interface based on Material Design
+
+---
+
+## 📸 Preview
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/70a37871-3eae-4929-a294-d2f6980371ac" width="22%" />

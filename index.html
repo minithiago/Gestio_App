@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestio · Subscription Manager</title>
+<meta name="description" content="Gestio is an open-source Android app that helps you organize, track and manage all your digital subscriptions in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f9fb;
+    --bg-alt: #eaf3f7;
+    --surface: #ffffff;
+    --ink: #0f2d47;
+    --muted: #4c6274;
+    --line: #dbe6ed;
+    --brand: #0a87a8;
+    --brand-strong: #076f8a;
+    --brand-soft: #e2f5fa;
+    --cyan: #3ac8e0;
+    --teal: #1aabc8;
+    --navy: #0f2d47;
+    --shadow: 0 1px 2px rgba(15,45,71,.06), 0 12px 32px -12px rgba(15,45,71,.18);
+    --radius: 18px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a1622;
+      --bg-alt: #0e1e2c;
+      --surface: #122434;
+      --ink: #e7f1f6;
+      --muted: #9cb2c2;
+      --line: #20374a;
+      --brand: #3ac8e0;
+      --brand-strong: #6bd8ea;
+      --brand-soft: #123445;
+      --navy: #e7f1f6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -16px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a1622;
+    --bg-alt: #0e1e2c;
+    --surface: #122434;
+    --ink: #e7f1f6;
+    --muted: #9cb2c2;
+    --line: #20374a;
+    --brand: #3ac8e0;
+    --brand-strong: #6bd8ea;
+    --brand-soft: #123445;
+    --navy: #e7f1f6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -16px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: var(--brand-strong); }
+  h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; margin: 0; }
+  p { margin: 0; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 96px 0; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--brand-strong);
+    margin-bottom: 14px;
+  }
+  .section-head { max-width: 640px; margin-bottom: 48px; }
+  .section-head h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 800; }
+  .section-head p { color: var(--muted); margin-top: 14px; font-size: 18px; }
+
+  /* Nav */
+  header.nav {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(160%) blur(12px);
+    -webkit-backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  header.nav .wrap { display: flex; align-items: center; gap: 28px; height: 68px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800; font-size: 21px; letter-spacing: -0.02em; }
+  .brand svg { width: 30px; height: 30px; }
+  header.nav nav { display: flex; gap: 24px; margin-left: auto; }
+  header.nav nav a { color: var(--muted); text-decoration: none; font-size: 15px; font-weight: 600; }
+  header.nav nav a:hover { color: var(--ink); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 13px 22px; border-radius: 999px;
+    font-weight: 700; font-size: 16px; text-decoration: none;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    border: 1px solid transparent; cursor: pointer; font-family: inherit;
+  }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+  .btn-primary { background: var(--brand); color: #fff; box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--brand) 70%, transparent); }
+  :root[data-theme="dark"] .btn-primary { color: #06202c; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-primary { color: #06202c; } }
+  .btn-primary:hover { background: var(--brand-strong); transform: translateY(-1px); }
+  .btn-ghost { color: var(--ink); border-color: var(--line); background: var(--surface); }
+  .btn-ghost:hover { border-color: var(--brand); transform: translateY(-1px); }
+  .btn-sm { padding: 9px 16px; font-size: 14px; }
+
+  /* Hero */
+  .hero { padding: 72px 0 88px; overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px 6px 8px; border-radius: 999px;
+    background: var(--brand-soft); color: var(--brand-strong);
+    font-size: 14px; font-weight: 600; margin-bottom: 22px;
+  }
+  .pill b { background: var(--brand); color: #fff; padding: 2px 9px; border-radius: 999px; font-size: 12px; }
+  :root[data-theme="dark"] .pill b { color: #06202c; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill b { color: #06202c; } }
+  .hero h1 { font-size: clamp(40px, 6vw, 66px); font-weight: 800; letter-spacing: -0.035em; }
+  .hero h1 .accent {
+    background: linear-gradient(100deg, var(--teal), var(--cyan));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero .lead { font-size: 20px; color: var(--muted); margin: 22px 0 34px; max-width: 540px; }
+  .hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+  .hero .meta { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 36px; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .hero .meta span { display: inline-flex; align-items: center; gap: 8px; }
+  .hero .meta svg { width: 18px; height: 18px; color: var(--brand); }
+
+  .hero-visual { position: relative; display: flex; justify-content: center; }
+  .hero-visual::before {
+    content: ""; position: absolute; inset: 8% -10% auto; height: 80%;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--cyan) 40%, transparent), transparent);
+    filter: blur(20px); z-index: 0;
+  }
+  .phone {
+    position: relative; z-index: 1;
+    width: 300px; aspect-ratio: 921 / 2048;
+    border-radius: 44px; padding: 10px;
+    background: #0d1a26;
+    box-shadow: 0 0 0 2px #233446, 0 40px 80px -30px rgba(10,30,50,.55);
+  }
+  .phone img { width: 100%; height: 100%; object-fit: cover; border-radius: 34px; }
+  .float-card {
+    position: absolute; z-index: 2;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 16px; padding: 12px 16px; box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 12px; font-size: 14px;
+  }
+  .float-card .ico { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand-strong); flex: none; }
+  .float-card .ico svg { width: 20px; height: 20px; }
+  .float-card strong { display: block; font-size: 14px; }
+  .float-card small { color: var(--muted); font-size: 12.5px; }
+  .fc-1 { top: 16%; left: -4%; }
+  .fc-2 { bottom: 14%; right: -6%; }
+
+  /* Features */
+  .features { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .feature {
+    padding: 26px; border-radius: var(--radius);
+    background: var(--bg); border: 1px solid var(--line);
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  .feature:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--brand) 50%, var(--line)); }
+  .feature .ico {
+    width: 46px; height: 46px; border-radius: 14px;
+    display: grid; place-items: center;
+    background: var(--brand-soft); color: var(--brand-strong); margin-bottom: 18px;
+  }
+  .feature .ico svg { width: 22px; height: 22px; }
+  .feature h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .feature p { color: var(--muted); font-size: 15px; }
+
+  /* Screens */
+  .screens-track {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;
+  }
+  .screen figure { margin: 0; }
+  .screen .phone { width: 100%; border-radius: 34px; padding: 8px; }
+  .screen .phone img { border-radius: 27px; }
+  .screen figcaption { margin-top: 18px; }
+  .screen figcaption strong { display: block; font-size: 17px; }
+  .screen figcaption span { color: var(--muted); font-size: 14.5px; }
+  .note { margin-top: 32px; color: var(--muted); font-size: 14px; text-align: center; }
+
+  /* Calculator */
+  .calc { background: var(--bg-alt); }
+  .calc-box {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 0;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 24px; overflow: hidden; box-shadow: var(--shadow);
+  }
+  .calc-left { padding: 34px; }
+  .calc-left h3 { font-size: 18px; margin-bottom: 6px; }
+  .calc-left p.hint { color: var(--muted); font-size: 14.5px; margin-bottom: 22px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 9px 14px; border-radius: 999px;
+    background: var(--bg); border: 1px solid var(--line); color: var(--ink);
+    font: 600 14px/1 inherit; font-family: inherit; cursor: pointer;
+    transition: all .15s ease;
+  }
+  .chip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+  .chip .price { color: var(--muted); font-weight: 500; }
+  .chip:hover { border-color: var(--brand); }
+  .chip[aria-pressed="true"] { background: var(--brand-soft); border-color: var(--brand); }
+  .chip[aria-pressed="true"] .price { color: var(--brand-strong); }
+  .calc-right {
+    padding: 34px; background: var(--navy); color: #fff;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  :root[data-theme="dark"] .calc-right { background: #0c2b3e; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .calc-right { background: #0c2b3e; } }
+  .calc-right .label { font-size: 14px; color: #a9c6d6; font-weight: 600; }
+  .calc-right .big { font-size: 56px; font-weight: 800; letter-spacing: -0.03em; color: var(--cyan); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .calc-right .row { display: flex; justify-content: space-between; padding: 14px 0; border-top: 1px solid rgba(255,255,255,.12); font-variant-numeric: tabular-nums; }
+  .calc-right .row:first-of-type { margin-top: 22px; }
+  .calc-right .row span { color: #a9c6d6; }
+  .calc-right .row b { font-weight: 700; }
+  .bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.1); margin-top: 18px; }
+  .bar i { display: block; height: 100%; transition: width .3s ease; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 12.5px; color: #a9c6d6; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* Privacy */
+  .privacy .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+  .checklist { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }
+  .checklist li { display: flex; gap: 14px; align-items: flex-start; }
+  .checklist .ck { width: 26px; height: 26px; border-radius: 50%; background: #3dd68c; color: #0b3320; display: grid; place-items: center; flex: none; margin-top: 1px; }
+  .checklist .ck svg { width: 15px; height: 15px; }
+  .checklist strong { display: block; }
+  .checklist span { color: var(--muted); font-size: 15px; }
+  .privacy-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 24px;
+    padding: 30px; box-shadow: var(--shadow);
+  }
+  .notif {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 16px;
+  }
+  .notif + .notif { margin-top: 12px; }
+  .notif .app { width: 36px; height: 36px; border-radius: 10px; background: #0d1a26; display: grid; place-items: center; flex: none; }
+  .notif .app svg { width: 22px; height: 22px; }
+  .notif .top { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+  .notif strong { display: block; font-size: 15px; margin-top: 2px; }
+  .notif p { font-size: 14px; color: var(--muted); }
+
+  /* Tech */
+  .tech { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .tech .wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; }
+  .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .stack div {
+    padding: 18px 20px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg);
+  }
+  .stack strong { display: block; font-size: 16px; }
+  .stack span { color: var(--muted); font-size: 14px; }
+  .arch { margin-top: 28px; font-size: 14.5px; color: var(--muted); }
+  .arch code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 13px; background: var(--bg); border: 1px solid var(--line); padding: 2px 6px; border-radius: 6px; color: var(--ink); }
+
+  .terminal {
+    background: #0b1824; border-radius: 18px; overflow: hidden;
+    border: 1px solid #1d3244; box-shadow: var(--shadow);
+  }
+  .terminal .bar-top { display: flex; align-items: center; gap: 7px; padding: 12px 16px; background: #0f2131; border-bottom: 1px solid #1d3244; }
+  .terminal .bar-top i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  .terminal .bar-top span { margin-left: 10px; font-size: 13px; color: #7f98aa; }
+  .terminal .bar-top button { margin-left: auto; background: transparent; border: 1px solid #2a4357; color: #a9c6d6; border-radius: 8px; padding: 4px 10px; font: 600 12px/1.2 inherit; font-family: inherit; cursor: pointer; }
+  .terminal .bar-top button:hover { border-color: var(--cyan); color: #fff; }
+  .terminal pre {
+    margin: 0; padding: 22px; overflow-x: auto;
+    font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 14px; line-height: 1.9; color: #d6e6ef;
+  }
+  .terminal .c { color: #6c8799; }
+  .terminal .p { color: var(--cyan); user-select: none; }
+  .steps { margin-top: 22px; display: grid; gap: 10px; color: var(--muted); font-size: 15px; padding-left: 20px; }
+
+  /* CTA */
+  .cta { padding: 96px 0; }
+  .cta-box {
+    position: relative; overflow: hidden;
+    border-radius: 28px; padding: 64px 48px; text-align: center;
+    background: linear-gradient(135deg, #0f2d47 0%, #0a5d78 60%, #1aabc8 100%);
+    color: #fff;
+  }
+  .cta-box::after {
+    content: ""; position: absolute; width: 420px; height: 420px; border-radius: 50%;
+    right: -120px; top: -160px; background: rgba(58,200,224,.25); filter: blur(10px);
+  }
+  .cta-box h2 { font-size: clamp(30px, 4.4vw, 46px); font-weight: 800; position: relative; z-index: 1; }
+  .cta-box p { color: #cfe6ef; font-size: 18px; margin: 16px auto 32px; max-width: 520px; position: relative; z-index: 1; }
+  .cta-box .ctas { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; position: relative; z-index: 1; }
+  .cta-box .btn-primary { background: #fff; color: #0f2d47; }
+  .cta-box .btn-primary:hover { background: #e2f5fa; }
+  .cta-box .btn-ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.35); }
+  .cta-box .btn-ghost:hover { border-color: #fff; }
+
+  footer { border-top: 1px solid var(--line); padding: 36px 0; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+  footer .brand { font-size: 17px; }
+  footer .brand svg { width: 24px; height: 24px; }
+  footer nav { display: flex; gap: 20px; }
+  footer nav a { color: var(--muted); text-decoration: none; }
+  footer nav a:hover { color: var(--ink); }
+
+  .theme-toggle {
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer;
+  }
+  .theme-toggle svg { width: 18px; height: 18px; }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* Let grid children shrink so long code lines scroll instead of widening the page */
+  .hero .wrap > *, .privacy .wrap > *, .tech .wrap > *, .calc-box > * { min-width: 0; }
+
+  /* Responsive */
+  @media (max-width: 980px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .screens-track { grid-template-columns: repeat(2, 1fr); }
+    .tech .wrap, .privacy .wrap { grid-template-columns: 1fr; }
+    .calc-box { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    .hero .wrap { grid-template-columns: 1fr; }
+    .hero-visual { margin-top: 12px; }
+    .fc-1 { left: 2%; }
+    .fc-2 { right: 2%; }
+    header.nav nav { display: none; }
+    header.nav .theme-toggle { margin-left: auto; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 16px; }
+    section { padding: 72px 0; }
+    .hero { padding: 48px 0 64px; }
+    .grid-4 { grid-template-columns: 1fr; }
+    .screens-track {
+      display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 18px;
+      margin: 0 -16px; padding: 0 16px 8px;
+    }
+    .screen { flex: 0 0 72%; scroll-snap-align: center; }
+    .phone { width: 250px; }
+    .fc-1 { left: 0; top: 8%; }
+    .fc-2 { right: 0; bottom: 8%; }
+    .stack { grid-template-columns: 1fr; }
+    .calc-left, .calc-right { padding: 24px; }
+    .calc-right .big { font-size: 46px; }
+    .cta-box { padding: 48px 22px; }
+    header.nav .btn-sm { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="logo" viewBox="0 0 64 64">
+      <rect x="4" y="12" width="40" height="13" rx="6.5" fill="#3ac8e0"/>
+      <rect x="4" y="28" width="40" height="13" rx="6.5" fill="#1aabc8"/>
+      <rect x="4" y="44" width="27" height="10" rx="5" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  </defs>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Gestio home">
+      <svg><use href="#logo"/></svg>
+      Gestio
+    </a>
+    <nav aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#screens">Screens</a>
+      <a href="#calculator">Calculator</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#build">Build it</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+    </button>
+    <a class="btn btn-ghost btn-sm" href="https://github.com/minithiago/Gestio_App" target="_blank" rel="noopener">
+      <svg><use href="#i-github"/></svg> GitHub
+    </a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="pill"><b>Open source</b> Android · Kotlin · Jetpack Compose</span>
+        <h1>Every subscription.<br><span class="accent">One clear view.</span></h1>
+        <p class="lead">Gestio helps you organize, track and manage all your digital subscriptions in one place. Never miss a renewal date or lose track of your monthly spending again.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="https://github.com/minithiago/Gestio_App" target="_blank" rel="noopener">
+            <svg><use href="#i-github"/></svg> View on GitHub
+          </a>
+          <a class="btn btn-ghost" href="#features">See what it does</a>
+        </div>
+        <div class="meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M11 18h2"/></svg>Android 7.0+</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Data stays on your phone</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Renewal reminders</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="phone">
+          <img src="assets/screen-1.jpg" alt="Gestio home screen showing estimated monthly spend, next payment and category breakdown" width="921" height="2048">
+        </div>
+        <div class="float-card fc-1">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <div><strong>Netflix renews soon</strong><small>Reminder one day before</small></div>
+        </div>
+        <div class="float-card fc-2">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
+          <div><strong>Monthly spend</strong><small>Always up to date</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Features</span>
+        <h2>Everything you need to stay on top of recurring payments</h2>
+        <p>A focused set of tools built around one question: what am I paying for, and when?</p>
+      </div>
+      <div class="grid-4">
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg></div>
+          <h3>All in one place</h3>
+          <p>Streaming, music, gym, insurance, internet: every subscription in a single list.</p>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>
+          <h3>Add, edit, delete</h3>
+          <p>Set name, amount, category, billing cycle, due day, payment method, color and notes.</p>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9a2.5 2.5 0 0 0-2.5-1.5c-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2A2.6 2.6 0 0 1 9.5 15M12 6v1.5M12 16.5V18"/></svg></div>
+          <h3>Monthly &amp; yearly costs</h3>
+          <p>See your estimated monthly spend and what's due in the next 7 days at a glance.</p>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg></div>
+          <h3>Upcoming renewals</h3>
+          <p>Your next payment is always highlighted, with how many days are left until it's due.</p>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <h3>Renewal reminders</h3>
+          <p>System notifications the day before each charge, toggled on or off per subscription.</p>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9v9Z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15Z"/></svg></div>
+          <h3>Spending insights</h3>
+          <p>Breakdown by category, by payment method and by billing cycle: monthly vs. yearly.</p>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+          <h3>Search &amp; filter</h3>
+          <p>Find any subscription instantly, filter by category and sort by price, name or due date.</p>
+        </div>
+        <div class="feature reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7Z"/></svg></div>
+          <h3>Quick templates</h3>
+          <p>Load popular services like Netflix, Spotify or Xbox Game Pass in one tap to get started fast.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screens -->
+  <section id="screens">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">A look inside</span>
+        <h2>Clean, intuitive, Material Design</h2>
+        <p>Four tabs, zero clutter. A modern cyan and dark-blue palette built for contrast and legibility.</p>
+      </div>
+      <div class="screens-track">
+        <div class="screen reveal">
+          <figure>
+            <div class="phone"><img src="assets/screen-1.jpg" alt="Home tab" loading="lazy" width="921" height="2048"></div>
+            <figcaption><strong>Home</strong><span>Monthly spend, next payment and every upcoming renewal.</span></figcaption>
+          </figure>
+        </div>
+        <div class="screen reveal">
+          <figure>
+            <div class="phone"><img src="assets/screen-2.jpg" alt="Payments tab" loading="lazy" width="921" height="2048"></div>
+            <figcaption><strong>Payments</strong><span>Spending by category, payment method and billing cycle.</span></figcaption>
+          </figure>
+        </div>
+        <div class="screen reveal">
+          <figure>
+            <div class="phone"><img src="assets/screen-3.jpg" alt="Alerts tab" loading="lazy" width="921" height="2048"></div>
+            <figcaption><strong>Alerts</strong><span>Turn reminders on or off for each subscription.</span></figcaption>
+          </figure>
+        </div>
+        <div class="screen reveal">
+          <figure>
+            <div class="phone"><img src="assets/screen-4.jpg" alt="Settings tab" loading="lazy" width="921" height="2048"></div>
+            <figcaption><strong>Settings</strong><span>Load quick templates or wipe all data in one tap.</span></figcaption>
+          </figure>
+        </div>
+      </div>
+      <p class="note">Screenshots show the app's current Spanish interface.</p>
+    </div>
+  </section>
+
+  <!-- Calculator -->
+  <section class="calc" id="calculator">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Try it</span>
+        <h2>How much are your subscriptions really costing you?</h2>
+        <p>Tap the services you pay for. Prices are the default amounts from Gestio's built-in quick templates.</p>
+      </div>
+      <div class="calc-box reveal">
+        <div class="calc-left">
+          <h3>Pick your subscriptions</h3>
+          <p class="hint">Small monthly amounts add up faster than you'd think.</p>
+          <div class="chips" id="chips"></div>
+        </div>
+        <div class="calc-right" aria-live="polite">
+          <div class="label">Estimated monthly spend</div>
+          <div class="big" id="monthly">$0.00</div>
+          <div class="bar" id="bar"></div>
+          <div class="legend" id="legend"></div>
+          <div class="row"><span>Per year</span><b id="yearly">$0.00</b></div>
+          <div class="row"><span>Active subscriptions</span><b id="count">0</b></div>
+          <div class="row"><span>Over 5 years</span><b id="five">$0.00</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy -->
+  <section class="privacy" id="privacy">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow">Your data, your phone</span>
+        <h2 style="font-size: clamp(30px,4vw,42px); font-weight: 800;">Private by design</h2>
+        <p style="color: var(--muted); font-size: 18px; margin-top: 14px;">Gestio keeps your subscriptions in a local database on your own device. No ads, no analytics, no tracking.</p>
+        <ul class="checklist">
+          <li><span class="ck"><svg><use href="#i-check"/></svg></span><div><strong>Stored locally</strong><span>Everything lives in an on-device Room database.</span></div></li>
+          <li><span class="ck"><svg><use href="#i-check"/></svg></span><div><strong>No account required</strong><span>Open the app and start adding subscriptions right away.</span></div></li>
+          <li><span class="ck"><svg><use href="#i-check"/></svg></span><div><strong>Reminders that work offline</strong><span>Notifications are scheduled on the device with Android alarms.</span></div></li>
+          <li><span class="ck"><svg><use href="#i-check"/></svg></span><div><strong>Fully open source</strong><span>Read every line of code on GitHub.</span></div></li>
+        </ul>
+      </div>
+      <div class="privacy-card reveal" aria-label="Example notifications">
+        <div class="notif">
+          <div class="app"><svg style="color:#fff"><use href="#logo"/></svg></div>
+          <div style="flex:1">
+            <div class="top"><span>Gestio</span><span>now</span></div>
+            <strong>Upcoming renewal</strong>
+            <p>Your Netflix Premium subscription for $15.99 is due soon.</p>
+          </div>
+        </div>
+        <div class="notif">
+          <div class="app"><svg style="color:#fff"><use href="#logo"/></svg></div>
+          <div style="flex:1">
+            <div class="top"><span>Gestio</span><span>1d</span></div>
+            <strong>Upcoming renewal</strong>
+            <p>Your Creative Cloud subscription for $54.99 is due soon.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech -->
+  <section class="tech" id="build">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow">Under the hood</span>
+        <h2 style="font-size: clamp(30px,4vw,42px); font-weight: 800; margin-bottom: 14px;">Modern Android, 100% Kotlin</h2>
+        <p style="color: var(--muted); font-size: 18px; margin-bottom: 28px;">Built with the current recommended Android stack, with a simple layered architecture that's easy to read and extend.</p>
+        <div class="stack">
+          <div><strong>Kotlin</strong><span>The whole codebase</span></div>
+          <div><strong>Jetpack Compose</strong><span>Declarative UI</span></div>
+          <div><strong>Material 3</strong><span>Components &amp; theming</span></div>
+          <div><strong>Room</strong><span>Local SQLite persistence</span></div>
+          <div><strong>Coroutines &amp; Flow</strong><span>Async, reactive data</span></div>
+          <div><strong>AlarmManager</strong><span>Scheduled reminders</span></div>
+        </div>
+        <p class="arch">Architecture: <code>Room DAO</code> → <code>Repository</code> → <code>ViewModel</code> → <code>Compose UI</code>, with a <code>BroadcastReceiver</code> for notifications.</p>
+      </div>
+      <div class="reveal">
+        <div class="terminal">
+          <div class="bar-top">
+            <i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>
+            <span>Get the code</span>
+            <button id="copyBtn" type="button">Copy</button>
+          </div>
+<pre id="cmds"><span class="c"># Clone the repository</span>
+<span class="p">$ </span>git clone https://github.com/minithiago/Gestio_App.git
+<span class="p">$ </span>cd Gestio_App
+
+<span class="c"># Build and install on a connected device</span>
+<span class="p">$ </span>./gradlew installDebug</pre>
+        </div>
+        <ol class="steps">
+          <li>Or open the project in Android Studio and let Gradle sync.</li>
+          <li>Run it on a device or emulator with Android 7.0 (API 24) or newer.</li>
+          <li>Targets Android 16 (API 36).</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap">
+      <div class="cta-box reveal">
+        <h2>Take back control of your subscriptions</h2>
+        <p>Star the repo, try the app, or contribute an idea. Gestio is open source and growing.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="https://github.com/minithiago/Gestio_App" target="_blank" rel="noopener"><svg><use href="#i-github"/></svg> Star on GitHub</a>
+          <a class="btn btn-ghost" href="https://github.com/minithiago/Gestio_App/issues" target="_blank" rel="noopener">Report an issue</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top"><svg><use href="#logo"/></svg> Gestio</a>
+    <span>Subscription manager for Android · Built with Kotlin &amp; Jetpack Compose</span>
+    <nav>
+      <a href="https://github.com/minithiago/Gestio_App" target="_blank" rel="noopener">GitHub</a>
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // Quick templates from SubscriptionViewModel.kt (default monthly amounts)
+  const templates = [
+    { name: "Netflix", price: 16.99, cat: "Entertainment", color: "#E50914", on: true },
+    { name: "Spotify", price: 10.99, cat: "Music", color: "#1DB954", on: true },
+    { name: "Disney+", price: 13.99, cat: "Entertainment", color: "#0063E5" },
+    { name: "Max", price: 9.99, cat: "Entertainment", color: "#5b3fd1" },
+    { name: "YouTube Premium", price: 12.99, cat: "Entertainment", color: "#FF0000" },
+    { name: "Amazon Prime", price: 4.99, cat: "Entertainment", color: "#00A8E1", on: true },
+    { name: "iCloud", price: 2.99, cat: "Services", color: "#2997FF" },
+    { name: "Nintendo Switch Online", price: 3.99, cat: "Entertainment", color: "#E60012" },
+    { name: "PlayStation Plus", price: 8.99, cat: "Entertainment", color: "#3a6ee8" },
+    { name: "Xbox Game Pass", price: 14.99, cat: "Entertainment", color: "#107C10" },
+    { name: "Gym", price: 35.00, cat: "Health", color: "#FF5722" },
+    { name: "Health insurance", price: 50.00, cat: "Health", color: "#2196F3" },
+    { name: "Fiber / Internet", price: 29.99, cat: "Services", color: "#9C27B0", on: true }
+  ];
+  const catColors = { Entertainment: "#3ac8e0", Music: "#3dd68c", Health: "#ffb547", Services: "#8f9bff" };
+  const fmt = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const chipsEl = document.getElementById("chips");
+  templates.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.style.setProperty("--c", t.color);
+    b.setAttribute("aria-pressed", t.on ? "true" : "false");
+    b.innerHTML = `<span class="dot"></span>${t.name}<span class="price">${fmt(t.price)}</span>`;
+    b.addEventListener("click", () => {
+      t.on = !t.on;
+      b.setAttribute("aria-pressed", String(!!t.on));
+      update();
+    });
+    chipsEl.appendChild(b);
+  });
+
+  function update() {
+    const active = templates.filter(t => t.on);
+    const monthly = active.reduce((s, t) => s + t.price, 0);
+    document.getElementById("monthly").textContent = fmt(monthly);
+    document.getElementById("yearly").textContent = fmt(monthly * 12);
+    document.getElementById("five").textContent = fmt(monthly * 60);
+    document.getElementById("count").textContent = active.length;
+
+    const byCat = {};
+    active.forEach(t => byCat[t.cat] = (byCat[t.cat] || 0) + t.price);
+    const bar = document.getElementById("bar");
+    const legend = document.getElementById("legend");
+    bar.innerHTML = ""; legend.innerHTML = "";
+    Object.entries(byCat).sort((a, b) => b[1] - a[1]).forEach(([cat, v]) => {
+      const pct = monthly ? (v / monthly) * 100 : 0;
+      const seg = document.createElement("i");
+      seg.style.width = pct + "%";
+      seg.style.background = catColors[cat];
+      bar.appendChild(seg);
+      const l = document.createElement("span");
+      l.innerHTML = `<i style="background:${catColors[cat]}"></i>${cat} (${Math.round(pct)}%)`;
+      legend.appendChild(l);
+    });
+  }
+  update();
+
+  // Copy commands
+  document.getElementById("copyBtn").addEventListener("click", async (e) => {
+    const text = "git clone https://github.com/minithiago/Gestio_App.git\ncd Gestio_App\n./gradlew installDebug";
+    try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied!"; }
+    catch { e.target.textContent = "Select & copy"; }
+    setTimeout(() => e.target.textContent = "Copy", 1600);
+  });
+
+  // Theme toggle (remembered per viewer)
+  const root = document.documentElement;
+  try { const saved = localStorage.getItem("gestio-theme"); if (saved) root.dataset.theme = saved; } catch {}
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const isDark = root.dataset.theme
+      ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = isDark ? "light" : "dark";
+    try { localStorage.setItem("gestio-theme", root.dataset.theme); } catch {}
+  });
+
+  // Reveal on scroll
+  const io = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: 0.12 }) : null;
+  document.querySelectorAll(".reveal").forEach(el => io ? io.observe(el) : el.classList.add("in"));
+</script>
+</body>
+</html>
